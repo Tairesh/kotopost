@@ -101,8 +101,8 @@ function getClickHandler() {
 
         var imageSourceUrl       = info.srcUrl,
             imageUploadHelperUrl = 'upload.html#',
-            vkCLientId           = '3315996',
-            vkRequestedScopes    = 'docs,offline',
+            vkCLientId           = '3503043',
+            vkRequestedScopes    = 'photos,wall,groups,offline',
             vkAuthenticationUrl  = 'https://oauth.vk.com/authorize?client_id=' + vkCLientId + '&scope=' + vkRequestedScopes + '&redirect_uri=http%3A%2F%2Foauth.vk.com%2Fblank.html&display=page&response_type=token';
 
         chrome.storage.local.get({'vkaccess_token': {}}, function (items) {
