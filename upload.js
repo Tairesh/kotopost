@@ -24,7 +24,7 @@ function upload(imageUrl, fileName, accToken) {
             requestFormData,
             documentUploadRequest;
 
-        documentUploadServer.open('GET', 'https://api.vk.com/method/docs.getUploadServer?access_token=' + accToken);
+        documentUploadServer.open('GET', 'https://api.vk.com/method/photos.getWallUploadServer?access_token=' + accToken);
 
         documentUploadServer.onload = function () {
 
@@ -48,7 +48,7 @@ function upload(imageUrl, fileName, accToken) {
             requestFormData       = new FormData();
             documentUploadRequest = new XMLHttpRequest();
 
-            requestFormData.append("file", uploadHttpRequest.response, fileName);
+            requestFormData.append("photo", uploadHttpRequest.response, fileName);
 
             documentUploadRequest.open('POST', answer.response.upload_url, true);
 
@@ -65,7 +65,21 @@ function upload(imageUrl, fileName, accToken) {
 
                 documentSaveRequest = new XMLHttpRequest();
 
-                documentSaveRequest.open('GET', 'https://api.vk.com/method/docs.save?file=' + answer.file + '&access_token=' + accToken);
+                documentSaveRequest.open('GET', 'https://api.vk.com/method/photos.saveWallPhoto?group_id='+41647208+'&photo=' + answer.photo + '&access_token=' + accToken);
+
+                documentSaveRequest.onload = function () {
+
+                    var answer = JSON.parse(documentSaveRequest.response);
+
+                    if (answer.response.photo === undefined) {
+                        thereIsAnError('documentSaveRequest - no file in response', answer, imageUrl);
+
+                        return;
+                    }
+                    
+                    documentSaveRequest = new XMLHttpRequest();
+
+                documentSaveRequest.open('GET', 'https://api.vk.com/method/wall.post?owner_id=-'+41647208+'&attachments=' + answer.pid + '&access_token=' + accToken);
 
                 documentSaveRequest.onload = function () {
 
@@ -76,6 +90,12 @@ function upload(imageUrl, fileName, accToken) {
 
                         return;
                     }
+
+                    document.getElementById('wrap').innerHTML = '<p></p><br/><br/><center><h1>Successfully uploaded!</h1></center><br/>';
+                    setTimeout(function () { window.close(); }, 3000);
+                };
+
+                documentSaveRequest.send();
 
                     document.getElementById('wrap').innerHTML = '<p></p><br/><br/><center><h1>Successfully uploaded!</h1></center><br/>';
                     setTimeout(function () { window.close(); }, 3000);
