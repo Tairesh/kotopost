@@ -13,7 +13,7 @@ function thereIsAnError(textToShow, errorToShow, imageUrl) {
  * @param  {string} fileName Name of the new uploaded file on VK documents
  * @param  {string} accToken Access token with vk authentication permissions
  */
-function upload(imageUrl, fileName, accToken) {
+ function upload(imageUrl, fileName, accToken) {
     "use strict";
 
     var uploadHttpRequest = new XMLHttpRequest();
@@ -24,7 +24,7 @@ function upload(imageUrl, fileName, accToken) {
             requestFormData,
             documentUploadRequest;
 
-        documentUploadServer.open('GET', 'https://api.vk.com/method/photos.getWallUploadServer?access_token=' + accToken);
+        documentUploadServer.open('GET', 'https://api.vk.com/method/photos.getWallUploadServer?gid='+41647208+'&access_token=' + accToken);
 
         documentUploadServer.onload = function () {
 
@@ -56,22 +56,25 @@ function upload(imageUrl, fileName, accToken) {
 
                 var answer = JSON.parse(documentUploadRequest.response),
                     documentSaveRequest;
+                    console.log(answer);
 
-                if (answer.file === undefined) {
+                if (answer.photo === "[]") {
                     thereIsAnError('Upload blob problem response problem', answer, imageUrl);
 
                     return;
                 }
+                
 
                 documentSaveRequest = new XMLHttpRequest();
-
-                documentSaveRequest.open('GET', 'https://api.vk.com/method/photos.saveWallPhoto?group_id='+41647208+'&photo=' + answer.photo + '&access_token=' + accToken);
+var url = 'https://api.vk.com/method/photos.saveWallPhoto?gid='+41647208+'&hash='+answer.hash+'&photo=' + answer.photo + '&server='+answer.server+'&access_token=' + accToken;
+console.log(url);
+                documentSaveRequest.open('GET', url);
 
                 documentSaveRequest.onload = function () {
 
                     var answer = JSON.parse(documentSaveRequest.response);
-
-                    if (answer.response.photo === undefined) {
+    			console.log(answer);
+                    if (answer.response[0] === undefined) {
                         thereIsAnError('documentSaveRequest - no file in response', answer, imageUrl);
 
                         return;
@@ -79,13 +82,13 @@ function upload(imageUrl, fileName, accToken) {
                     
                     documentSaveRequest = new XMLHttpRequest();
 
-                documentSaveRequest.open('GET', 'https://api.vk.com/method/wall.post?owner_id=-'+41647208+'&attachments=' + answer.pid + '&access_token=' + accToken);
+                documentSaveRequest.open('GET', 'https://api.vk.com/method/wall.post?owner_id=-'+41647208+'&from_group=1&attachments=' + answer.response[0].id + '&access_token=' + accToken);
 
                 documentSaveRequest.onload = function () {
 
                     var answer = JSON.parse(documentSaveRequest.response);
 
-                    if (answer.response[0].url === undefined) {
+                    if (answer.response.post_id === undefined) {
                         thereIsAnError('documentSaveRequest - no file in response', answer, imageUrl);
 
                         return;
@@ -97,8 +100,6 @@ function upload(imageUrl, fileName, accToken) {
 
                 documentSaveRequest.send();
 
-                    document.getElementById('wrap').innerHTML = '<p></p><br/><br/><center><h1>Successfully uploaded!</h1></center><br/>';
-                    setTimeout(function () { window.close(); }, 3000);
                 };
 
                 documentSaveRequest.send();
@@ -114,6 +115,43 @@ function upload(imageUrl, fileName, accToken) {
     uploadHttpRequest.open('GET', imageUrl);
     uploadHttpRequest.send();
 }
+ /*
+function upload(imageUrl, fileName, accToken) {
+    "use strict";
+	console.log("file: "+fileName);
+	$.post("https://api.vk.com/method/photos.getWallUploadServer?gid="+41647208+"&access_token="+accToken,{},function(data) {
+		var upload_url = data.response.upload_url;
+		if (upload_url != undefined) {
+			console.log ('start upload to '+upload_url);
+			
+			var requestFormData = new FormData();
+            var documentUploadRequest = new XMLHttpRequest();
+
+            requestFormData.append("photo", fileName, "blob");
+
+            documentUploadRequest.open('POST', upload_url, true);
+            documentUploadRequest.onload = function () {
+
+                var answer = JSON.parse(documentUploadRequest.response);
+                console.log(answer);
+               if (answer != undefined) {
+                var hash = answer.hash;
+                var photo = answer.photo;
+                var server = answer.server;
+                
+                var url ="https://api.vkontakte.ru/method/photos.saveWallPhoto?gid="+41647208+"&access_token="+accToken+"&server="+server+"&photo="+photo+"&hash="+hash;
+                console.log(url);
+                $.post(url,{},function(data) {
+					console.log(data);
+				});
+                
+                
+               } else alert('error! do can not upload file!');
+            }
+            documentUploadRequest.send(requestFormData);
+		} else alert('error! do can not get wall upload server url');
+	});
+}*/
 
 /**
  * Add a listener for DOMContentLoaded event
