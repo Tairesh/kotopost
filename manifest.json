@@ -4,15 +4,15 @@
       "background.js"
     ]
   },
-   "description": "Posting images to vk group",
+   "description": "Отправка картинок с котиками прямо в группу КотоПост",
    "icons": {
-      "128": "imageinfo-128.png",
-      "16": "imageinfo-16.png",
-      "48": "imageinfo-48.png"
+      "128": "hp-cat-icon-128.png",
+      "16": "hp-cat-icon-16.png",
+      "48": "hp-cat-icon-48.png"
    },
    "manifest_version": 2,
    "homepage_url": "http://tairesh.ru",
-   "name": "VK-group images posting",
+   "name": "КотоПост Dev",
    "permissions": [ "contextMenus", "tabs", "storage" , "http://*/*", "https://*/*" ],
-   "version": "1.0.0"
+   "version": "1.3.0"
 }

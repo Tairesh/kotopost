@@ -105,7 +105,7 @@ function getClickHandler() {
             vkRequestedScopes    = 'photos,wall,groups,offline',
             vkAuthenticationUrl  = 'https://oauth.vk.com/authorize?client_id=' + vkCLientId + '&scope=' + vkRequestedScopes + '&redirect_uri=http%3A%2F%2Foauth.vk.com%2Fblank.html&display=page&response_type=token';
 
-        chrome.storage.local.get({'vkaccess_token': {}}, function (items) {
+			chrome.storage.local.get({'vkaccess_token': {}}, function (items) {
 
             if (items.vkaccess_token.length === undefined) {
                 chrome.tabs.create({url: vkAuthenticationUrl, selected: true}, function (tab) {
@@ -124,12 +124,49 @@ function getClickHandler() {
 }
 
 /**
+ * Handle main functionality of 'onlick' chrome context menu item method
+ */
+function getClickHandlerPending() {
+    "use strict";
+
+    return function (info, tab) {
+
+        var imageSourceUrl       = info.srcUrl,
+            imageUploadHelperUrl = 'upload.html#',
+            vkCLientId           = '3503043',
+            vkRequestedScopes    = 'photos,wall,groups,offline',
+            vkAuthenticationUrl  = 'https://oauth.vk.com/authorize?client_id=' + vkCLientId + '&scope=' + vkRequestedScopes + '&redirect_uri=http%3A%2F%2Foauth.vk.com%2Fblank.html&display=page&response_type=token';
+
+			chrome.storage.local.get({'vkaccess_token': {}}, function (items) {
+
+            if (items.vkaccess_token.length === undefined) {
+                chrome.tabs.create({url: vkAuthenticationUrl, selected: true}, function (tab) {
+                    chrome.tabs.onUpdated.addListener(listenerHandler(tab.id, imageSourceUrl));
+                });
+
+                return;
+            }
+
+            imageUploadHelperUrl += imageSourceUrl + '&' + items.vkaccess_token + '&pending';
+
+            chrome.tabs.create({url: imageUploadHelperUrl, selected: true});
+
+        });
+    };
+}
+
+/**
  * Handler of chrome context menu creation process -creates a new item in the context menu
  */
 chrome.contextMenus.create({
-    "title": "Rehost on vk.com",
+    "title": "Запостить прямо сейчас",
     "type": "normal",
     "contexts": ["image"],
     "onclick": getClickHandler()
 });
-
+chrome.contextMenus.create({
+    "title": "Запостить с таймером в 10 минут",
+    "type": "normal",
+    "contexts": ["image"],
+    "onclick": getClickHandlerPending()
+});
