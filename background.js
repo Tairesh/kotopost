@@ -159,14 +159,14 @@ function getClickHandlerPending() {
  * Handler of chrome context menu creation process -creates a new item in the context menu
  */
 chrome.contextMenus.create({
-    "title": "Запостить прямо сейчас",
+    "title": "Запостить в КотоПост",
     "type": "normal",
     "contexts": ["image"],
     "onclick": getClickHandler()
-});
+});/*
 chrome.contextMenus.create({
     "title": "Запостить с таймером в 10 минут",
     "type": "normal",
     "contexts": ["image"],
     "onclick": getClickHandlerPending()
-});
+});*/
